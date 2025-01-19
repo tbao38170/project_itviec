@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Login</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+      .google-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .google-btn img {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+      }
+      .google-btn:hover {
+        background-color: #357ae8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Login with Google</h1>
+    <div
+      id="g_id_onload"
+      data-client_id="551554063395-u0n1pg7f1q84k9esn9k18k96liounhd3.apps.googleusercontent.com"
+      data-context="signin"
+      data-callback="handleCredentialResponse"
+    ></div>
+    <div class="g_id_signin" data-type="standard"></div>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+      function handleCredentialResponse(response) {
+        console.log("Encoded JWT ID token: " + response.credential);
+        // Send `response.credential` to your server for validation
+      }
+    </script>
+  </body>
+</html>
