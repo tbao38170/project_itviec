@@ -5,6 +5,8 @@ import { LoginDto } from "src/commons/dtos/login.dto";
 import { AuthGuard } from "./auth.guard";
 import { RefreshTokenDto } from "src/commons/dtos/refresh-token.dto";
 import { Public } from "src/commons/decorators/public.decorator";
+import { LoginGGDto } from "src/commons/dtos/loginGG.dto";
+import { RegisterCompanyDto } from "src/commons/dtos/register- company.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -21,7 +23,11 @@ export class AuthController {
   login(@Body() body: LoginDto) {
     return this.authService.login(body);
   }
-
+  @Public()
+  @Post("login-google")
+  loginWithGG(@Body() body: LoginGGDto) {
+    return this.authService.loginWithGG(body);
+  }
   //api refresh token login
   @Public()
   @Post("refresh-token")
@@ -35,5 +41,11 @@ export class AuthController {
     return {
       message: "test Guards",
     };
+  }
+
+  @Public()
+  @Post("register-company")
+  registerCompany(@Body() body: RegisterCompanyDto) {
+    return this.authService.registerCompany(body);
   }
 }

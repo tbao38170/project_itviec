@@ -5,6 +5,7 @@ import { UserRepository } from "src/databases/repositories/user.repository";
 import { ApplicantRepository } from "src/databases/repositories/applicant.repository";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import { CompanyRepository } from "src/databases/repositories/company.repository";
 
 @Module({
   controllers: [AuthController],
@@ -12,6 +13,7 @@ import { ConfigService } from "@nestjs/config";
     AuthService,
     UserRepository,
     ApplicantRepository,
+    CompanyRepository,
     JwtService,
     ConfigService,
   ],

@@ -7,53 +7,76 @@ import { OAuth2Client } from "google-auth-library";
 import { LoginDto } from "src/commons/dtos/login.dto";
 import { LoginGGDto } from "src/commons/dtos/loginGG.dto";
 import { RefreshTokenDto } from "src/commons/dtos/refresh-token.dto";
+import { RegisterCompanyDto } from "src/commons/dtos/register- company.dto";
 import { RegisterUserDto } from "src/commons/dtos/register-user.dto";
 import { APPLICANT_LEVEL } from "src/commons/enums/manuscript.enum";
 import { LOGIN_TYPE, ROLE } from "src/commons/enums/user.enum";
+import { Applicant } from "src/databases/entities/applicant.entity";
+import { Company } from "src/databases/entities/company.entity";
 import { User } from "src/databases/entities/user.entity";
 import { ApplicantRepository } from "src/databases/repositories/applicant.repository";
+import { CompanyRepository } from "src/databases/repositories/company.repository";
 import { UserRepository } from "src/databases/repositories/user.repository";
+import { DataSource } from "typeorm";
 
 @Injectable()
 export class AuthService {
   //laay du lieyu ra : repository : can lay ra
   constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
     private readonly userRepository: UserRepository,
     private readonly applicantRepository: ApplicantRepository,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly companyRepository: CompanyRepository,
+    private readonly dataSource: DataSource
   ) {}
 
+  //register user-applicanr
   async registerUser(body: RegisterUserDto) {
     const { username, email, password } = body;
 
     // check Email Exist
     //tim 1 voi dieu kien
-    const userRecord = await this.userRepository.findOneBy({ email: email });
+    const userRecord = await this.userRepository.findOne({ where: { email } });
+    console.log(userRecord, "user record");
+
     //neu ton tai thi tra ra loi
     if (userRecord) {
-      throw new HttpException("Ëmail is Exist", HttpStatus.BAD_REQUEST); // request 400
+      throw new HttpException("Email is Exist", HttpStatus.BAD_REQUEST); // request 400
     }
 
     // dung thu vien node-argon2 de ma hoa
     const hashPassword = await argon2.hash(password);
+    //dung transaction
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
 
-    // create new user
-    const newUser = await this.userRepository.save({
-      email,
-      username,
-      password: hashPassword,
-      loginType: LOGIN_TYPE.EMAIL,
-      role: ROLE.APPLICANT,
-    });
+    try {
+      await queryRunner.startTransaction();
+      // create new user
+      const newUser = await queryRunner.manager.save(User, {
+        email,
+        username,
+        password: hashPassword,
+        loginType: LOGIN_TYPE.EMAIL,
+        role: ROLE.APPLICANT,
+      });
+      // console.log(newUser, "new User");
 
-    // create new applicant by user
-    await this.applicantRepository.save({
-      userId: newUser.id,
-    });
-    return {
-      message: "REGISTER USER SUCCESSFULLY",
-    };
+      // create new applicant by user
+      queryRunner.manager.save(Applicant, {
+        userId: newUser.id,
+      });
+      await queryRunner.commitTransaction();
+      return {
+        message: "REGISTER USER SUCCESSFULLY",
+      };
+    } catch (error) {
+      console.log(error);
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   //Hàm Login
@@ -182,9 +205,10 @@ export class AuthService {
       email: email,
       // loginType: LOGIN_TYPE.GOOGLE,
     });
+    // check xem user da ddang ky user chua
     if (userRecord && userRecord.loginType === LOGIN_TYPE.GOOGLE) {
       throw new HttpException(
-        "Email Had been login" + email,
+        "Email had been login" + email,
         HttpStatus.UNAUTHORIZED
       ); // requ
     }
@@ -209,5 +233,81 @@ export class AuthService {
         refreshToken,
       },
     };
+  }
+
+  // register company hr
+  async registerCompany(body: RegisterCompanyDto) {
+    const {
+      username,
+      email,
+      password,
+      companyName,
+      companyAddress,
+      companyWebsite,
+    } = body;
+
+    // check Email Exist
+    //tim 1 voi dieu kien
+    const userRecord = await this.userRepository.findOneBy({ email: email });
+    //neu ton tai thi tra ve loi
+    if (userRecord) {
+      throw new HttpException(
+        "Email is already in use",
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    // Mã hóa mật khẩu
+    if (!password) {
+      throw new HttpException("Password is required", HttpStatus.BAD_REQUEST);
+    }
+    const hashPassword = await argon2.hash(password);
+    /// lam transaction
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    try {
+      await queryRunner.startTransaction();
+      // Tạo user mới
+      // const newUser = await this.userRepository.save({
+      //   email,
+      //   username,
+      //   password: hashPassword,
+      //   loginType: LOGIN_TYPE.EMAIL,
+      //   role: ROLE.COMPANY,
+      // });
+
+      // Tạo user mới
+      const newUser = await queryRunner.manager.save(User, {
+        email,
+        username,
+        password: hashPassword,
+        loginType: LOGIN_TYPE.EMAIL,
+        role: ROLE.COMPANY,
+      });
+
+      // Tạo thông tin công ty liên kết với user
+      // const newCompany = await this.companyRepository.save({
+      //   userId: newUser.id,
+      //   name: companyName,
+      //   location: companyAddress,
+      //   website: companyWebsite,
+      // });
+      const newCompany = await queryRunner.manager.save(Company, {
+        userId: newUser.id,
+        name: companyName,
+        location: companyAddress,
+        website: companyWebsite,
+      });
+      await queryRunner.commitTransaction();
+      return {
+        message: "Company registered successfully",
+      };
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      console.log(e);
+    } finally {
+      await queryRunner.release();
+    }
   }
 }
