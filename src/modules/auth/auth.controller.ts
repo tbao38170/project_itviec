@@ -6,7 +6,7 @@ import { AuthGuard } from "./auth.guard";
 import { RefreshTokenDto } from "src/commons/dtos/refresh-token.dto";
 import { Public } from "src/commons/decorators/public.decorator";
 import { LoginGGDto } from "src/commons/dtos/loginGG.dto";
-import { RegisterCompanyDto } from "src/commons/dtos/register- company.dto";
+import { RegisterCompanyDto } from "src/commons/dtos/register-company.dto";
 
 @Controller("auth")
 export class AuthController {
