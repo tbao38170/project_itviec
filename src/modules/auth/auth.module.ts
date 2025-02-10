@@ -6,8 +6,11 @@ import { ApplicantRepository } from "src/databases/repositories/applicant.reposi
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { CompanyRepository } from "src/databases/repositories/company.repository";
+import { MailService } from "../mail/mail.service";
+import { MailModule } from "../mail/mail.module";
 
 @Module({
+  imports: [MailModule],
   controllers: [AuthController],
   providers: [
     AuthService,
@@ -16,12 +19,7 @@ import { CompanyRepository } from "src/databases/repositories/company.repository
     CompanyRepository,
     JwtService,
     ConfigService,
+    MailService,
   ],
 })
-// @Controller("auth")
-export class AuthModule {
-  // @Get()
-  // findAll(): string {
-  //   return "This action returns all cats";
-  // }
-}
+export class AuthModule {}

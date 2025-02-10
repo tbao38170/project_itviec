@@ -9,7 +9,7 @@ export class RegisterCompanyDto {
   @IsNotEmpty()
   username: string;
 
-  @ApiProperty({ example: "hr1@gmail.com" })
+  @ApiProperty({ example: "k01-itviec@yopmail.com" })
   @IsEmail()
   @IsNotEmpty()
   email: string;

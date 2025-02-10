@@ -23,6 +23,13 @@ export default () => ({
     ClientID: process.env.GG_CUSTOMER_ID,
     clientSecret: process.env.GG_CUSTOMER_SECRET,
   },
+  mail: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
+    from: process.env.MAIL_FROM,
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
+  },
 });
 
 export const validateEnvironments = (): void => {

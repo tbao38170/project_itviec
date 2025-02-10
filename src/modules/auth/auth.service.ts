@@ -7,7 +7,7 @@ import { OAuth2Client } from "google-auth-library";
 import { LoginDto } from "src/commons/dtos/login.dto";
 import { LoginGGDto } from "src/commons/dtos/loginGG.dto";
 import { RefreshTokenDto } from "src/commons/dtos/refresh-token.dto";
-import { RegisterCompanyDto } from "src/commons/dtos/register- company.dto";
+
 import { RegisterUserDto } from "src/commons/dtos/register-user.dto";
 import { APPLICANT_LEVEL } from "src/commons/enums/manuscript.enum";
 import { LOGIN_TYPE, ROLE } from "src/commons/enums/user.enum";
@@ -18,6 +18,8 @@ import { ApplicantRepository } from "src/databases/repositories/applicant.reposi
 import { CompanyRepository } from "src/databases/repositories/company.repository";
 import { UserRepository } from "src/databases/repositories/user.repository";
 import { DataSource } from "typeorm";
+import { MailService } from "../mail/mail.service";
+import { RegisterCompanyDto } from "src/commons/dtos/register-company.dto";
 
 @Injectable()
 export class AuthService {
@@ -28,7 +30,8 @@ export class AuthService {
     private readonly userRepository: UserRepository,
     private readonly applicantRepository: ApplicantRepository,
     private readonly companyRepository: CompanyRepository,
-    private readonly dataSource: DataSource
+    private readonly dataSource: DataSource,
+    private readonly mailService: MailService
   ) {}
 
   //register user-applicanr
@@ -38,7 +41,7 @@ export class AuthService {
     // check Email Exist
     //tim 1 voi dieu kien
     const userRecord = await this.userRepository.findOne({ where: { email } });
-    console.log(userRecord, "user record");
+    // console.log(userRecord, "user record");
 
     //neu ton tai thi tra ra loi
     if (userRecord) {
@@ -50,10 +53,10 @@ export class AuthService {
     //dung transaction
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-
+    console.log("Starting transaction...");
+    await queryRunner.startTransaction();
     try {
-      await queryRunner.startTransaction();
-      // create new user
+      // Các thao tác trong transaction
       const newUser = await queryRunner.manager.save(User, {
         email,
         username,
@@ -61,20 +64,35 @@ export class AuthService {
         loginType: LOGIN_TYPE.EMAIL,
         role: ROLE.APPLICANT,
       });
-      // console.log(newUser, "new User");
 
-      // create new applicant by user
-      queryRunner.manager.save(Applicant, {
-        userId: newUser.id,
-      });
+      await queryRunner.manager.save(Applicant, { userId: newUser.id });
+      // Gửi email sau khi transaction hoàn tất
+      await this.mailService.sendMail(
+        email,
+        "Welcome To IT VIEC",
+        "welcome-applicant",
+        {
+          name: username,
+          email: email,
+        }
+      );
+      console.log("Committing transaction...");
+      // if (queryRunner.isTransactionActive) {
       await queryRunner.commitTransaction();
-      return {
-        message: "REGISTER USER SUCCESSFULLY",
-      };
+      // }
+
+      return { message: "REGISTER USER SUCCESSFULLY" };
     } catch (error) {
-      console.log(error);
+      console.error("Transaction error:", error);
+
+      // if (queryRunner.isTransactionActive) {
+
       await queryRunner.rollbackTransaction();
+      // }
+
+      // throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     } finally {
+      console.log("Releasing query runner...");
       await queryRunner.release();
     }
   }
@@ -266,8 +284,9 @@ export class AuthService {
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
+    console.log("Starting transaction...");
+    await queryRunner.startTransaction();
     try {
-      await queryRunner.startTransaction();
       // Tạo user mới
       // const newUser = await this.userRepository.save({
       //   email,
@@ -293,13 +312,23 @@ export class AuthService {
       //   location: companyAddress,
       //   website: companyWebsite,
       // });
-      const newCompany = await queryRunner.manager.save(Company, {
+      await queryRunner.manager.save(Company, {
         userId: newUser.id,
         name: companyName,
         location: companyAddress,
         website: companyWebsite,
       });
+      await this.mailService.sendMail(
+        "k01-itviec@yopmail.com",
+        "Welcome to IT VIEC",
+        "welcome-applicant", // Tên template chính xác
+        {
+          name: username,
+          email: email,
+        }
+      );
       await queryRunner.commitTransaction();
+
       return {
         message: "Company registered successfully",
       };
