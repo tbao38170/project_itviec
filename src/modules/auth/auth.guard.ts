@@ -54,10 +54,10 @@ export class AuthGuard {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
-    console.log(user, "user");
+    // console.log(user, "user");
 
     const result = requiredRoles.some((role) => user.role?.includes(role));
-    console.log(result);
+    // console.log(result);
 
     return result;
     //   const roles = this.reflector.get(Roles, context.getHandler());
