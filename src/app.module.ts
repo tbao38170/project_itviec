@@ -14,6 +14,7 @@ import { MailModule } from "./modules/mail/mail.module";
 import { StorageModule } from "./modules/storage/storage.module";
 import { SkillModule } from "./modules/skill/skill.module";
 import { IndustryModule } from "./modules/industry/Industry.module";
+import { CompanyModule } from "./modules/company/company.module";
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { IndustryModule } from "./modules/industry/Industry.module";
     StorageModule,
     SkillModule,
     IndustryModule,
+    CompanyModule,
   ],
   controllers: [AppController],
   providers: [

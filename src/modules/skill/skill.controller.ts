@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from "@nestjs/common";
 import { SkillService } from "./skill.service";
 import { Public } from "src/commons/decorators/public.decorator";
@@ -14,6 +15,7 @@ import { SkillRepository } from "src/databases/repositories/skill.repository";
 import { ApiBearerAuth } from "@nestjs/swagger";
 import { Roles } from "src/commons/decorators/role.decorator";
 import { ROLE } from "src/commons/enums/user.enum";
+import { SkillQueryDto } from "src/commons/dtos/skill-query.dto";
 
 @ApiBearerAuth()
 @Controller("skill")
@@ -46,8 +48,8 @@ export class SkillController {
   @Public()
   // @Roles(ROLE.ADMIN, )
   @Get()
-  getAll(@Body() body: UpsertSkillDto) {
-    return this.skillService.getAll(body);
+  getAll(@Query() queries: SkillQueryDto) {
+    return this.skillService.getAll(queries);
   }
   //=================
   @Roles(ROLE.ADMIN)
