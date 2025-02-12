@@ -12,6 +12,7 @@ import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard } from "./modules/auth/auth.guard";
 import { MailModule } from "./modules/mail/mail.module";
 import { StorageModule } from "./modules/storage/storage.module";
+import { SkillModule } from "./modules/skill/skill.module";
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { StorageModule } from "./modules/storage/storage.module";
     AuthModule,
     // MailModule,
     StorageModule,
+    SkillModule,
   ],
   controllers: [AppController],
   providers: [
@@ -39,6 +41,7 @@ import { StorageModule } from "./modules/storage/storage.module";
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+      // useClass: RolesGuard,
     },
   ],
 })
