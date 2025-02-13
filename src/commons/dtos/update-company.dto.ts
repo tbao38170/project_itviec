@@ -14,7 +14,7 @@ import {
 
 //upsert = update + insert
 export class UpdateCompanyDto {
-  @ApiProperty({ example: "Font-End" })
+  @ApiProperty()
   @IsNumber()
   @IsOptional()
   industryId: number;
@@ -34,7 +34,7 @@ export class UpdateCompanyDto {
   @IsOptional()
   desciption: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: "" })
   @IsString()
   @IsOptional()
   logo: string;
@@ -44,22 +44,22 @@ export class UpdateCompanyDto {
   @IsOptional()
   codeTax: string;
 
-  @ApiProperty({ example: COMPANY_ADDRESS.HA_NOI })
+  @ApiProperty({ example: COMPANY_ADDRESS.HA_NOI, enum: COMPANY_ADDRESS })
   @IsEnum(COMPANY_ADDRESS)
   @IsOptional()
   location: COMPANY_ADDRESS;
 
-  @ApiProperty({ example: COMPANY_SIZE.SMALL })
+  @ApiProperty({ example: COMPANY_SIZE.SMALL, enum: COMPANY_SIZE })
   @IsEnum(COMPANY_SIZE)
   @IsOptional()
   companySize: COMPANY_SIZE;
 
-  @ApiProperty({ example: COMPANY_TYPE.NON_IT })
+  @ApiProperty({ example: COMPANY_TYPE.NON_IT, enum: COMPANY_TYPE })
   @IsEnum(COMPANY_TYPE)
   @IsOptional()
   companyType: COMPANY_TYPE;
 
-  @ApiProperty({ example: "Font-End" })
+  @ApiProperty({ example: "mon->fri" })
   @IsString()
   @IsOptional()
   workingDay: string;
