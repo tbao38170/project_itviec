@@ -13,8 +13,9 @@ import { AuthGuard } from "./modules/auth/auth.guard";
 import { MailModule } from "./modules/mail/mail.module";
 import { StorageModule } from "./modules/storage/storage.module";
 import { SkillModule } from "./modules/skill/skill.module";
-import { IndustryModule } from "./modules/industry/Industry.module";
+import { IndustryModule } from "./modules/industry/industry.module";
 import { CompanyModule } from "./modules/company/company.module";
+import { ManuscriptModule } from "./modules/manuscript/manuscript.module";
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CompanyModule } from "./modules/company/company.module";
     StorageModule,
     SkillModule,
     IndustryModule,
+    ManuscriptModule,
     CompanyModule,
   ],
   controllers: [AppController],

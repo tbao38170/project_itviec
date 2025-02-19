@@ -1,31 +1,31 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { IndustryQueryDto } from "src/commons/dtos/Industry-query.dto";
+import { IndustryQueryDto } from "src/commons/dtos/industry-query.dto";
 
-import { UpsertIndustryDto } from "src/commons/dtos/upsert-Industry.dto";
-import { IndustryRepository } from "src/databases/repositories/Industry.repository";
+import { UpsertIndustryDto } from "src/commons/dtos/upsert-industry.dto";
+import { IndustryRepository } from "src/databases/repositories/industry.repository";
 import { ILike } from "typeorm";
 
 @Injectable()
 export class IndustryService {
   //laay du lieyu ra : repository : can lay ra
-  constructor(private readonly skillRepository: IndustryRepository) {}
+  constructor(private readonly industryRepository: IndustryRepository) {}
 
   //func crud : create update, read, delete
 
   async create(body: UpsertIndustryDto) {
-    const skillRecord = await this.skillRepository.save(body);
+    const industryRecord = await this.industryRepository.save(body);
 
     return {
       message: "create Industry successfully!",
-      result: skillRecord,
+      result: industryRecord,
     };
   }
   async get(id: number) {
-    const skillRecord = await this.skillRepository.findOneBy({ id });
+    const industryRecord = await this.industryRepository.findOneBy({ id });
 
     return {
       message: "Get detail Industry successfully!",
-      result: skillRecord,
+      result: industryRecord,
     };
   }
   //====================================================
@@ -33,7 +33,7 @@ export class IndustryService {
     const { name } = queries;
 
     const whereClause = name ? ILike(`%${name}%`) : {};
-    const result = await this.skillRepository.find({
+    const result = await this.industryRepository.find({
       where: whereClause,
     });
 
@@ -45,29 +45,29 @@ export class IndustryService {
 
   //=============================================
   async update(body: UpsertIndustryDto, id: number) {
-    const skillRecord = await this.skillRepository.findOneBy({ id });
+    const industryRecord = await this.industryRepository.findOneBy({ id });
 
     //check ton tai
-    if (!skillRecord) {
+    if (!industryRecord) {
       throw new HttpException("Industry not found", HttpStatus.NOT_FOUND);
     }
-    const skillUpdated = await this.skillRepository.save({
-      ...skillRecord,
+    const industryUpdated = await this.industryRepository.save({
+      ...industryRecord,
       ...body,
     });
 
     return {
       message: "Update Industry successfully!",
-      result: skillUpdated,
+      result: industryUpdated,
     };
   }
   //======================================================
   async delete(id: number) {
-    const skillRecord = await this.skillRepository.delete({ id });
+    const industryRecord = await this.industryRepository.delete({ id });
 
     return {
       message: "delete Industry successfully!",
-      result: skillRecord,
+      result: industryRecord,
     };
   }
   //================================
