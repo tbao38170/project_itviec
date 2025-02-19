@@ -3,7 +3,7 @@ import { UpdateCompanyDto } from "src/commons/dtos/update-company.dto";
 import { User } from "src/databases/entities/user.entity";
 import { CompanyRepository } from "src/databases/repositories/company.repository";
 import { StorageService } from "../storage/storage.service";
-import { IndustryRepository } from "src/databases/repositories/Industry.repository";
+import { IndustryRepository } from "src/databases/repositories/industry.repository";
 
 @Injectable()
 export class CompanyService {

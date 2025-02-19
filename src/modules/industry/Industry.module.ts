@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
-import { IndustryService } from "./Industry.service";
-import { IndustryController } from "./Industry.controller";
-import { IndustryRepository } from "src/databases/repositories/Industry.repository";
+import { IndustryService } from "./industry.service";
+import { IndustryController } from "./industry.controller";
+import { IndustryRepository } from "src/databases/repositories/industry.repository";
 
 @Module({
   controllers: [IndustryController],
